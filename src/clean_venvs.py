@@ -1,6 +1,7 @@
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
@@ -43,7 +44,13 @@ def process_directory(path, python):
 	requirements_file = path.parent / "requirements.txt"
 	with open(requirements_file, "w") as fout:
 		fout.write(requirements.stdout)
-	subprocess.run(["rm", "-rf", path])
+	try:
+		shutil.rmtree(path)
+	except FileNotFoundError:
+		pass
+	except OSError as error:
+		print(f"Failed to remove {path} due to {error}.")
+		return
 	print(f"Sucessfully wrote requirements.txt file and deleted virtual environment at {path}.")
 	return
 
