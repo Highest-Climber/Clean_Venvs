@@ -32,10 +32,10 @@ def process_directory(path, python):
 		return
 	try:
 		requirements = subprocess.run([str(python), "-m", "pip", "freeze"], check=True, timeout=60, capture_output=True, text=True)
-	except subprocess.CalledProcessError:
+	except subprocess.CalledProcessError as error:
 		print(f"Failed to run pip freeze on virtual environment at {path}.")
-		print(f"Error code: {requirements.returncode}")
-		print(f"Error output: {requirements.stderr}")
+		print(f"Error code: {error.returncode}")
+		print(f"Error output: {error.stderr}")
 		return
 	except subprocess.TimeoutExpired:
 		print(f"Running pip freeze on virtual environment at {path} took too long.")
