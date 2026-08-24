@@ -1,22 +1,14 @@
 import os
 import pathlib
-import re
 import shutil
 import subprocess
 import sys
 
-yes_pattern = re.compile(r"(?i)\b(y|yes|yeah|yep|yup|sure|ok(?:ay)?|alright|affirmative|correct|true|indeed|absolutely|definitely|of course|sounds good|why not|i think so|i guess so)\b")
-no_pattern = re.compile(r"(?i)\b(n|no|nope|nah|naw|negative|never|false|incorrect|not really|not at all|absolutely not|do not|don't|cannot|can't|won't)\b")
-
-def read_yes_no(prompt):
-    while True:
-        response = input(prompt)
-        if yes_pattern.search(response) and not no_pattern.search(response):
-            return True
-        elif no_pattern.search(response) and not yes_pattern.search(response):
-            return False
-        else:
-            print("I didn't understand that.")
+def confirm(prompt):
+	response = input(prompt).strip().lower()
+	if "y" in response and "n" not in response:
+		return True
+	return False
 
 def find_python(path):
 	possible_pythons = [path / "bin" / "python", path / "Scripts" / "python.exe"]
@@ -27,7 +19,7 @@ def find_python(path):
 	return None
 
 def process_directory(path, python):
-	confirmation = read_yes_no(f"Removing virtual environment at {path}. Would you like to continue? ")
+	confirmation = confirm(f"Removing virtual environment at {path}. Would you like to continue? [y/N] ")
 	if not confirmation:
 		print(f"Skipping virtual environment at {path}.")
 		return
