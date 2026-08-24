@@ -17,9 +17,6 @@ def read_yes_no(prompt):
         else:
             print("I didn't understand that.")
 
-def get_subdirectories(path):
-	return [pathlib.Path(root) / directory for root, directories, files in os.walk(path) for directory in directories]
-
 def find_python(path):
 	possible_pythons = [path / "bin" / "python", path / "Scripts" / "python.exe"]
 	for possible_python in possible_pythons:
@@ -28,12 +25,7 @@ def find_python(path):
 				return possible_python
 	return None
 
-def process_directory(path):
-	if not (path / "pyvenv.cfg").is_file():
-		return
-	python = find_python(path)
-	if not python:
-		return
+def process_directory(path, python):
 	confirmation = read_yes_no(f"Removing virtual environment at {path}. Would you like to continue? ")
 	if not confirmation:
 		print(f"Skipping virtual environment at {path}.")
@@ -56,10 +48,15 @@ def process_directory(path):
 	return
 
 def clean_up(root):
-	directories = get_subdirectories(root)
-	for directory in directories:
-		if directory.is_dir():
-			process_directory(directory)
+	for current, directories, files in os.walk(root):
+		path = pathlib.Path(current)
+		if "pyvenv.cfg" not in files:
+			continue
+		python = find_python(path)
+		if python is None:
+			continue
+		directories.clear()
+		process_directory(path, python)
 
 if __name__ == "__main__":
 	if len(sys.argv) > 1:
